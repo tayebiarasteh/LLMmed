@@ -7,6 +7,8 @@ https://github.com/tayebiarasteh/
 """
 
 import os
+import pdb
+
 import numpy as np
 import pandas as pd
 
@@ -14,6 +16,7 @@ from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, confusion_m
 from scipy.stats import ranksums
 from statsmodels.stats.multitest import multipletests
 from scipy.stats import norm
+from mne.stats import fdr_correction
 
 
 def sensitivity(y_true, y_pred):
@@ -111,6 +114,10 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
 
         p_value = bootstrap_p_value(y_true1, y_pred1 if metric != roc_auc_score else y_pred_proba1,
                                     y_pred2 if metric != roc_auc_score else y_pred_proba2, metric, n_bootstrap)
+
+        # Apply Benjamini-Hochberg FDR correction to p-values
+        reject_fdr, p_value = fdr_correction(p_value, alpha=0.05, method='indep')
+
         results[metric_name] = {
             "Method1": {
                 "Mean": mean_metric1,
@@ -131,6 +138,8 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
 
     # Print the results
     print_results_updated_v3(results)
+
+
 
 
 
