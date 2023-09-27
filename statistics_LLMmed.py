@@ -8,15 +8,14 @@ https://github.com/tayebiarasteh/
 
 import os
 import pdb
-
 import numpy as np
 import pandas as pd
 
-from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, confusion_matrix
+from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, confusion_matrix, roc_curve
 from scipy.stats import ranksums
-from statsmodels.stats.multitest import multipletests
 from scipy.stats import norm
 from mne.stats import fdr_correction
+
 
 
 def sensitivity(y_true, y_pred):
@@ -27,6 +26,7 @@ def sensitivity(y_true, y_pred):
 def specificity(y_true, y_pred):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     return tn / (tn + fp)
+
 
 
 def bootstrap_metric_statistics_and_samples(y_true, y_pred, metric_func, n_bootstrap=1000):
@@ -68,29 +68,70 @@ def save_bootstrapped_samples_to_csv(samples_dict, csv_filename):
     df.to_csv(csv_filename, index=False)
 
 
-def print_results_updated_v3(results_dict):
-    print("Statistical Analysis Results:\n")
-    for metric, values in results_dict.items():
-        print(f"Metric: {metric}")
-        for method, stats in values.items():
-            if method != "p_value":
-                print(f"  {method}:")
-                print(f"    - Mean: {stats['Mean']:.3f}")
-                print(f"    - Std: {stats['Std']:.3f}")
-                print(f"    - 95% CI: ({stats['95% CI'][0]:.3f}, {stats['95% CI'][1]:.3f})")
-        if values['p_value'] is not None:
-            print(f"  p-value: {values['p_value']:.3f}\n")
+def print_results_updated_v3(results_dict, filename="output.txt"):
+    with open(filename, "w") as file:
+        # Print and write the main header
+        print("Statistical Analysis Results:\n")
+        file.write("Statistical Analysis Results:\n\n")
+
+        for metric, values in results_dict.items():
+            # Print and write metric name
+            print(f"Metric: {metric}")
+            file.write(f"Metric: {metric}\n")
+
+            for method, stats in values.items():
+                if method != "p_value":
+                    # Print and write method name
+                    print(f"  {method}:")
+                    file.write(f"  {method}:\n")
+
+                    # Print and write metric statistics
+                    print(f"    - Mean: {stats['Mean']:.3f}")
+                    file.write(f"    - Mean: {stats['Mean']:.3f}\n")
+
+                    print(f"    - Std: {stats['Std']:.3f}")
+                    file.write(f"    - Std: {stats['Std']:.3f}\n")
+
+                    print(f"    - 95% CI: ({stats['95% CI'][0]:.3f}, {stats['95% CI'][1]:.3f})")
+                    file.write(f"    - 95% CI: ({stats['95% CI'][0]:.3f}, {stats['95% CI'][1]:.3f})\n")
+
+            if values['p_value'] is not None:
+                # Print and write p-value
+                print(f"  p-value: {values['p_value']:.3f}\n")
+                file.write(f"  p-value: {values['p_value']:.3f}\n\n")
 
 
 def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, n_bootstrap=1000):
     results1 = pd.read_csv(csv_file1)
     results2 = pd.read_csv(csv_file2)
     y_true1 = results1["ground_truth"]
-    y_pred1 = (results1["Probability"] > 0.5).astype(int)
-    y_pred_proba1 = results1["Probability"]
+    y_pred1 = (results1["probability"] > 0.5).astype(int)
+    y_pred_proba1 = results1["probability"]
     y_true2 = results2["ground_truth"]
-    y_pred2 = (results2["Probability"] > 0.5).astype(int)
-    y_pred_proba2 = results2["Probability"]
+    y_pred2 = (results2["probability"] > 0.5).astype(int)
+    y_pred_proba2 = results2["probability"]
+
+
+    # # ############################## Youden's ##############################
+    # # # threshold finding for metrics calculation (Youden's theorem)
+    # optimal_threshold = np.zeros(y_true1.shape[0])
+    # for idx in range(y_true1.shape[0]):
+    #     fpr, tpr, thresholds = roc_curve(y_true1, y_pred_proba1)
+    #     # optimal_idx = np.argmax(tpr - fpr)
+    #     optimal_idx = np.argmax(tpr + (1 - fpr))
+    #     optimal_threshold[idx] = thresholds[optimal_idx]
+    # y_true1 = (y_pred_proba1 > optimal_threshold).astype(np.int32)
+    #
+    # optimal_threshold = np.zeros(y_true2.shape[0])
+    # for idx in range(y_true2.shape[0]):
+    #     fpr, tpr, thresholds = roc_curve(y_true2, y_pred_proba2)
+    #     # optimal_idx = np.argmax(tpr - fpr)
+    #     optimal_idx = np.argmax(tpr + (1 - fpr))
+    #     optimal_threshold[idx] = thresholds[optimal_idx]
+    # y_true2 = (y_pred_proba2 > optimal_threshold).astype(np.int32)
+    # # ############################## Youden's ##############################
+
+
 
     metrics = [roc_auc_score, accuracy_score, f1_score, sensitivity, specificity]
     metric_names = ["AUC", "Accuracy", "F1 Score", "Sensitivity", "Specificity"]
@@ -107,7 +148,6 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
         mean_metric2, std_metric2, ci2, values2 = bootstrap_metric_statistics_and_samples(y_true2,
                                                                                           y_pred2 if metric != roc_auc_score else y_pred_proba2,
                                                                                           metric, n_bootstrap)
-
         # Add samples to the dictionary
         samples1[metric_name] = values1
         samples2[metric_name] = values2
@@ -119,12 +159,12 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
         reject_fdr, p_value = fdr_correction(p_value, alpha=0.05, method='indep')
 
         results[metric_name] = {
-            "Method1": {
+            "Data Scientist": {
                 "Mean": mean_metric1,
                 "Std": std_metric1,
                 "95% CI": ci1
             },
-            "Method2": {
+            "Using ChatGPT ADA": {
                 "Mean": mean_metric2,
                 "Std": std_metric2,
                 "95% CI": ci2
@@ -145,5 +185,6 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
 
 
 if __name__ == '__main__':
+
 
     main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2)
