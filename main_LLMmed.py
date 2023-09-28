@@ -118,6 +118,7 @@ class cohort1():
         # Train the Gradient Boosting classifier
         clf = GradientBoostingClassifier()
         clf.fit(X_train, y_train)
+        print("Chosen hyperparameters:", clf.get_params())
 
         # Predict on the test set
         y_pred = clf.predict(X_test)
@@ -168,7 +169,7 @@ class cohort1():
 
         print(train_data.shape, test_data.shape)
 
-        # Convert the relevant columns to their appropriate data types
+        # columns with number data types
         cols_to_convert = [
             "Age at diagnosis of first tumor {s)",
             "Plasma NMN pg/ml",
@@ -176,10 +177,6 @@ class cohort1():
             "Plasma MTY  pg/ml",
             "Spherical volume of  primary  tumor{s)"
         ]
-
-        for col in cols_to_convert:
-            train_data[col] = train_data[col].astype(float)
-            test_data[col] = test_data[col].astype(float)
 
         # Impute missing values with median for both training and test data
         for col in cols_to_convert:
@@ -259,7 +256,9 @@ class cohort1():
         sensitivity = tp / (tp + fn)
         specificity = tn / (tn + fp)
 
+        print("Chosen hyperparameters:", ada_clf.get_params())
         print("Best parameters:", grid_search.best_params_)
+
         print(auc, accuracy, f1, sensitivity, specificity)
 
 
@@ -268,7 +267,6 @@ class cohort1():
 class cohort2():
     def __int__(self):
         pass
-
 
 
     def main_train_DS(self):
@@ -295,12 +293,15 @@ class cohort2():
         X_test = test.drop([target], axis=1)
         y_test = test[target]
 
-        # Initialize the KNN imputer
-        imputer = KNNImputer(n_neighbors=5)
+        # Initialize the label encoder
+        le = LabelEncoder()
+        X_train['Ethnic'] = le.fit_transform(X_train['Ethnic'])
+        # Replace unobserved categories with a placeholder
+        X_test['Ethnic'] = [le.transform([val])[0] if val in le.classes_ else 0 for val in X_test['Ethnic']]
 
         # Remove non-numeric features
-        X_train = X_train.drop(['No.', 'CheckID', 'Ethnic'], axis=1)
-        X_test = X_test.drop(['No.', 'CheckID', 'Ethnic', 'DuodenalOther'], axis=1)
+        X_train = X_train.drop(['No.', 'CheckID'], axis=1)
+        X_test = X_test.drop(['No.', 'CheckID', 'DuodenalOther'], axis=1)
 
         # Identify non-numeric columns in the training set
         non_numeric_columns_train = X_train.select_dtypes(include=['object']).columns.tolist()
@@ -314,28 +315,13 @@ class cohort2():
         # Drop these additional features from the test set
         X_test = X_test.drop(additional_features_test, axis=1)
 
-        # Fit the imputer on the train data and transform both train and test data
-        X_train_imputed = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
-        X_test_imputed = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns)
-
         # Check again for missing values
-        missing_train_imputed = X_train_imputed.isnull().sum().sum()
-        missing_test_imputed = X_test_imputed.isnull().sum().sum()
+        missing_train_imputed = X_train.isnull().sum().sum()
+        missing_test_imputed = X_test.isnull().sum().sum()
 
         print(missing_train_imputed, missing_test_imputed)
-
-        # Fit the imputer on the train data and transform both train and test data
-        X_train_imputed = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
-        X_test_imputed = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns)
-
-        # Check again for missing values
-        missing_train_imputed = X_train_imputed.isnull().sum().sum()
-        missing_test_imputed = X_test_imputed.isnull().sum().sum()
-
-        print(missing_train_imputed, missing_test_imputed)
-
-        # Print non-numeric columns
-        print(non_numeric_columns_train, non_numeric_columns_test)
+        X_train_imputed = X_train
+        X_test_imputed = X_test
 
 
         print('training started ...\n')
@@ -344,6 +330,7 @@ class cohort2():
 
         # Initialize the LGBMClassifier
         clf = lgb.LGBMClassifier(n_estimators=300, learning_rate=0.05, objective='binary', random_state=42)
+        pdb.set_trace()
 
         # Fit the model
         clf.fit(X_train_imputed, y_train)
@@ -351,7 +338,6 @@ class cohort2():
         # Predict using the best model
         y_pred_proba = clf.predict_proba(X_test_imputed)[:, 1]
         y_pred = (y_pred_proba > 0.5).astype(np.int32)  # Default threshold
-
 
         # saving the results in a CSV
         # Create a dataframe with Probabilities
@@ -573,7 +559,7 @@ class cohort4():
             'bootstrap': [True, False]
         }
 
-        clf = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, verbose=1, n_jobs=-1, scoring='accuracy', cv=3)
+        clf = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, verbose=1, n_jobs=-1, scoring='accuracy', cv=5)
         clf.fit(X_train_scaled, y_train)
 
         print("Best hyperparameters found: ", clf.best_params_)
@@ -614,9 +600,9 @@ class cohort4():
 
 if __name__ == '__main__':
     # cohort = cohort1()
-    # cohort = cohort2()
+    cohort = cohort2()
     # cohort = cohort3()
-    cohort = cohort4()
+    # cohort = cohort4()
 
     cohort.main_train_DS()
     # cohort.main_train_GPT()
