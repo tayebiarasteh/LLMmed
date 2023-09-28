@@ -18,9 +18,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
 from scipy.stats import ranksums
 from scipy.stats import norm
-from sklearn.impute import KNNImputer
 import lightgbm as lgb
-from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVC
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
@@ -40,7 +38,7 @@ class cohort1():
         """
 
         # Load the data
-        data = pd.read_excel("/home/soroosh/Documents/datasets/LLMmed/1/DataZonodo_v2_original.xlsx")
+        data = pd.read_excel("/PATH.xlsx")
 
         # Display the first few rows of the data
         data.head()
@@ -132,7 +130,7 @@ class cohort1():
         result_df["ground_truth"] = y_test
 
         # Save the predictions to a CSV file
-        result_file_path = "/home/soroosh/Documents/datasets/LLMmed/1/ADA_predictions.csv"
+        result_file_path = "/PATH.csv"
         result_df.to_csv(result_file_path, index=False)
 
 
@@ -154,7 +152,7 @@ class cohort1():
         """Uses Adaboost ensemble tree classifier with grid search optimization
         """
         # Load the data
-        data = pd.read_excel("/home/soroosh/Documents/datasets/LLMmed/1/DataZonodo_v2_original.xlsx")
+        data = pd.read_excel("/PATH.xlsx")
 
         # Display the first few rows of the data
         data.head()
@@ -244,7 +242,7 @@ class cohort1():
         result_df["probability"] = y_pred_proba
         result_df["ground_truth"] = y_test
 
-        result_file_path = "/home/soroosh/Documents/datasets/LLMmed/1/DS_predictions.csv"
+        result_file_path = "/PATH.csv"
         result_df.to_csv(result_file_path, index=False)
 
 
@@ -274,8 +272,8 @@ class cohort2():
         """
 
         # Load the train and test datasets
-        train = pd.read_csv("/home/soroosh/Documents/datasets/LLMmed/2/train.csv")
-        test = pd.read_csv("/home/soroosh/Documents/datasets/LLMmed/2/test.csv")
+        train = pd.read_csv("/PATH.csv")
+        test = pd.read_csv("/PATH.csv")
 
         # Check for missing values in the train and test datasets
         missing_train = train.isnull().sum().sum()
@@ -325,19 +323,19 @@ class cohort2():
 
 
         print('training started ...\n')
-        # # Initialize the Gradient Boosting Classifier
-        # gb = GradientBoostingClassifier(random_state=0)
 
         # Initialize the LGBMClassifier
-        clf = lgb.LGBMClassifier(n_estimators=300, learning_rate=0.05, objective='binary', random_state=42)
-        pdb.set_trace()
-
+        clf = lgb.LGBMClassifier(n_estimators=300, learning_rate=0.1, objective='binary', class_weight='balanced', random_state=42)
+        print(clf.get_params())
         # Fit the model
         clf.fit(X_train_imputed, y_train)
 
         # Predict using the best model
         y_pred_proba = clf.predict_proba(X_test_imputed)[:, 1]
         y_pred = (y_pred_proba > 0.5).astype(np.int32)  # Default threshold
+
+
+
 
         # saving the results in a CSV
         # Create a dataframe with Probabilities
@@ -346,18 +344,8 @@ class cohort2():
         result_df["ground_truth"] = y_test
 
         # Save the predictions to a CSV file
-        result_file_path = "/home/soroosh/Documents/datasets/LLMmed/2/DS_predictions.csv"
+        result_file_path = "/PATH.csv"
         result_df.to_csv(result_file_path, index=False)
-
-        # # threshold finding for metrics calculation (Youden's theorem)
-        # # Calculate the ROC curve
-        # fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred_proba)
-        # # Calculate the Youden's Index for each threshold
-        # J = tpr - fpr
-        # # Identify the optimal threshold
-        # optimal_threshold = thresholds[np.argmax(J)]
-        # # Use the optimal threshold to classify predicted probabilities into predicted classes
-        # y_pred = (y_pred_proba > optimal_threshold).astype(np.int32)
 
         # Calculate evaluation metrics
         auc = roc_auc_score(y_test, y_pred_proba)
@@ -381,11 +369,11 @@ class cohort3():
         """Uses SVM
         """
 
-        discovery_set_path = "/home/soroosh/Documents/datasets/LLMmed/3/Discovery Set.xlsx"
+        discovery_set_path = "/PATH.xlsx"
         discovery_set = pd.read_excel(discovery_set_path, header=1)
 
         # Load the validation set
-        validation_set_path = "/home/soroosh/Documents/datasets/LLMmed/3/Validation Set_original.xlsx"
+        validation_set_path = "/PATH.xlsx"
         validation_set = pd.read_excel(validation_set_path, header=1)  # Skipping the first row to use the second row as the header
 
         # Separate features and target for discovery and validation sets
@@ -419,15 +407,6 @@ class cohort3():
 
         print('training started ...\n')
 
-        # # Train a RandomForest model
-        # model = RandomForestClassifier(random_state=42)
-        # model.fit(X_discovery, y_discovery)
-
-        # # Predict using the best model
-        # y_pred = model.predict(X_validation)
-        # y_pred_proba = model.predict_proba(X_validation)[:, 1]
-        # y_test = y_validation
-
         # Define the SVM classifier and parameters for hyperparameter tuning
         param_grid = {
             'C': [0.1, 1, 10, 100],
@@ -460,6 +439,8 @@ class cohort3():
         y_pred_proba = clf.predict_proba(X_validation)[:, 1]
         y_test = y_validation
 
+        print(clf.get_params())
+        print(clf.best_estimator_)
         # saving the results in a CSV
         # Create a dataframe with Probabilities
         result_df = pd.DataFrame()
@@ -467,7 +448,7 @@ class cohort3():
         result_df["ground_truth"] = y_test
 
         # Save the predictions to a CSV file
-        result_file_path = "/home/soroosh/Documents/datasets/LLMmed/3/DS_predictions.csv"
+        result_file_path = "/PATH.csv"
         result_df.to_csv(result_file_path, index=False)
 
         # Calculate evaluation metrics
@@ -494,9 +475,9 @@ class cohort4():
         """
 
         # Loading the dataset
-        train_path = "/home/soroosh/Documents/datasets/LLMmed/4/training_data.csv"
+        train_path = "/PATH.csv"
         train_data = pd.read_csv(train_path)
-        test_path = "/home/soroosh/Documents/datasets/LLMmed/4/test_data.csv"
+        test_path = "/PATH.csv"
         test_data = pd.read_csv(test_path)
 
         # Checking the distribution of the positive and negative classes in the "cohort_flag" column
@@ -530,14 +511,6 @@ class cohort4():
 
         print('training started ...\n')
 
-        # # Train a RandomForest model
-        # model = RandomForestClassifier(random_state=42)
-        # model.fit(X_train_scaled, y_train)
-        #
-        # # Predict using the best model
-        # y_pred = model.predict(X_test_scaled)
-        # y_pred_proba = model.predict_proba(X_test_scaled)[:, 1]
-
         # Checking for missing values
         missing_values = X_train.isnull().sum().sum()
         print(missing_values)
@@ -563,6 +536,8 @@ class cohort4():
         clf.fit(X_train_scaled, y_train)
 
         print("Best hyperparameters found: ", clf.best_params_)
+        print(clf.get_params())
+        print(clf.best_estimator_)
 
         # Predict using the best model
         y_pred = clf.predict(X_test_scaled)
@@ -575,7 +550,7 @@ class cohort4():
         result_df["ground_truth"] = y_test
 
         # Save the predictions to a CSV file
-        result_file_path = "/home/soroosh/Documents/datasets/LLMmed/4/DS_predictions.csv"
+        result_file_path = "/PATH.csv"
         result_df.to_csv(result_file_path, index=False)
 
         # Calculate evaluation metrics
@@ -600,9 +575,9 @@ class cohort4():
 
 if __name__ == '__main__':
     # cohort = cohort1()
-    cohort = cohort2()
+    # cohort = cohort2()
     # cohort = cohort3()
-    # cohort = cohort4()
+    cohort = cohort4()
 
     cohort.main_train_DS()
     # cohort.main_train_GPT()
