@@ -152,9 +152,62 @@ def SHAP_analysis_GPT(X_train, clf):
 
 
 
+def SHAP_box_plot():
+
+    # Load dataset
+    shap_values_df = pd.read_csv('/PATH/shap_box_data.csv')
+    avg_abs_shap_values = shap_values_df.abs().mean().sort_values(ascending=False)
+    top_features = avg_abs_shap_values.index.tolist()
+
+    # Define a color map for the dataset based on the calculated mean absolute SHAP values
+    min_avg_shap = avg_abs_shap_values.min()
+    max_avg_shap = avg_abs_shap_values.max()
+    norm_dataset = plt.Normalize(vmin=min_avg_shap, vmax=max_avg_shap)
+    sm_dataset = plt.cm.ScalarMappable(cmap="YlOrRd", norm=norm_dataset)
+    palette_dict_custom = {feature: sm_dataset.to_rgba(value) for feature, value in
+                                      avg_abs_shap_values.items()}
+
+    # Calculate means for the features
+    means_dataset = shap_values_df[top_features].mean()
+
+    fig, ax = plt.subplots(figsize=(18, 18))
+    sns.set_style("whitegrid", {'axes.grid': False})
+    sns.boxplot(data=shap_values_df[top_features], orient='h', palette=palette_dict_custom,
+                fliersize=5, flierprops={"marker": "o", "markerfacecolor": "black", "markeredgecolor": "black"}, ax=ax)
+    ax.scatter(means_dataset, range(len(top_features)), marker='x', color='black', s=500, zorder=5, label='Mean')
+    ax.axvline(x=0, color='black', linestyle='-', linewidth=3)
+
+    # Adjusting font sizes, positions, and x-axis range based on the adjusted values
+    x_min_specified_cardiology = -0.08
+    x_max_specified_cardiology = 0.20
+    specified_xticks_cardiology = [-0.05, 0.0, 0.05, 0.10, 0.15, 0.20]
+
+    ax.set_xlim(x_min_specified_cardiology, x_max_specified_cardiology)
+    ax.set_xticks(specified_xticks_cardiology)
+    ax.set_xticklabels([f"{value:.2f}" for value in specified_xticks_cardiology], fontsize=26)
+    ax.set_yticklabels(top_features, fontsize=30)
+    ax.set_xlabel("SHAP value (impact on model output)", fontsize=30, labelpad=20)
+    ax.set_ylabel("")  # Removing the y-axis name
+    ax.set_title("Cardiac Amyloidosis [Cardiology]", fontsize=36, ha='left', x=0, y=1.02)
+
+    # Adjust the colorbar to display the range values and label based on the data's values
+    cax = fig.add_axes([0.93, 0.125, 0.02, 0.75])
+    cbar = plt.colorbar(sm_dataset, cax=cax, orientation='vertical')
+    cbar.set_ticks(np.linspace(avg_abs_shap_values.min(), avg_abs_shap_values.max(), 5))
+    cbar.set_ticklabels([f"{value:.2f}" for value in
+                         np.linspace(avg_abs_shap_values.min(), avg_abs_shap_values.max(), 5)])
+    cbar.ax.tick_params(labelsize=30)
+    cbar.set_label('Mean absolute SHAP value', rotation=270, fontsize=30, labelpad=35)
+
+    plt.show()
+
+
+
+
 
 
 if __name__ == '__main__':
     ROC_curves()
     SHAP_analysis_GPT()
+    SHAP_box_plot()
 
