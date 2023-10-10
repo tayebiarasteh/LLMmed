@@ -1,7 +1,7 @@
 """
 Created on Oct 1, 2023.
 utils.py
-visualizations
+visualizations and explainability
 
 @author: Soroosh Tayebi Arasteh <soroosh.arasteh@rwth-aachen.de>
 https://github.com/tayebiarasteh/
@@ -34,7 +34,7 @@ def ROC_curves():
     ds_bootstrap = pd.read_csv('/PATH/DS_bootstrap.csv')
     ada_bootstrap = pd.read_csv('/PATH/ADA_bootstrap.csv')
 
-    # Compute mean and 95% CI for DS and ChatGPT ADA methods using bootstrapped data
+    # Compute mean and 95% CI for Validatory and ChatGPT ADA methods using bootstrapped data
     ds_mean_cardio, ds_ci_cardio = compute_mean_and_ci(ds_bootstrap['AUC'])
     ada_mean_cardio, ada_ci_cardio = compute_mean_and_ci(ada_bootstrap['AUC'])
 
@@ -53,9 +53,9 @@ def ROC_curves():
     # Generating the ROC curve plot
     plt.figure(figsize=(10, 8))
 
-    # Plotting the ROC curve for DS method with dotted line, red color, and thicker line width
+    # Plotting the ROC curve for Validatory method with dotted line, red color, and thicker line width
     plt.plot(ds_fpr_cardio, ds_tpr_cardio, color='red', lw=3, linestyle=':',
-             label=f'DS (AUROC = {ds_mean_cardio_rounded} [95% CI: {ds_ci_cardio_rounded[0]}, {ds_ci_cardio_rounded[1]}])')
+             label=f'Validatory (AUROC = {ds_mean_cardio_rounded} [95% CI: {ds_ci_cardio_rounded[0]}, {ds_ci_cardio_rounded[1]}])')
 
     # Plotting the ROC curve for ChatGPT ADA method with solid line, blue color, and thicker line width
     plt.plot(ada_fpr_cardio, ada_tpr_cardio, color='blue', lw=3,
@@ -66,47 +66,16 @@ def ROC_curves():
 
     # Setting the plot details
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate', fontsize=20)
-    plt.ylabel('True Positive Rate', fontsize=20)
-    plt.title('Cardiology', fontsize=22, loc='left', pad=20)
-    plt.legend(loc="lower right", fontsize=16)
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Positive Rate', fontsize=24)
+    plt.ylabel('True Positive Rate', fontsize=24)
+    plt.title('Hereditary Hearing Loss [Otolaryngology]', fontsize=24, loc='left', pad=20)
+    plt.legend(loc="lower right", fontsize=18)
+    plt.xticks(fontsize=22)
+    plt.yticks(fontsize=22)
     plt.grid(False)
     plt.tight_layout()
 
-
-
-def density_curves():
-    ds_predictions = pd.read_csv('/PATH/DS_predictions.csv')
-    ada_predictions = pd.read_csv('/PATH/ADA_predictions.csv')
-
-    plt.figure(figsize=(12, 6))
-    sns.set_style("white")  # Remove gridlines
-
-    # Histogram and KDE for DS method with hatch pattern
-    sns.histplot(ds_predictions['probability'], color="red", kde=True, label="DS", bins=30,
-                 stat="probability", hatch="///")
-
-    # Histogram and KDE for ADA method (without hatch pattern)
-    sns.histplot(ada_predictions['probability'], color="blue", kde=True, label="ChatGPT ADA", bins=30,
-                 stat="probability")
-
-    # Setting the x-axis limits
-    plt.xlim(0, 1)
-
-    # Adding title, legends, and labels with increased font size
-    plt.title("Cardiology", loc='left', fontsize=16, fontweight='bold', pad=20)
-    plt.xlabel("Decision Threshold", fontsize=16)
-    plt.ylabel("Density", fontsize=16)
-    plt.legend(loc='upper right', fontsize=16)
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.tight_layout()
-
-    # Show the plot
-    plt.show()
 
 
 
@@ -183,38 +152,9 @@ def SHAP_analysis_GPT(X_train, clf):
 
 
 
-def SHAP_box_plot(X_train, shap_values, top_feature_names):
-    # Create a SHAP Box Plot (whisker plot) for the top 10 features
-    plt.figure(figsize=(14, 8))
-    shap_values_df = pd.DataFrame(shap_values, columns=X_train.columns)
-    shap_values_df[top_feature_names].boxplot(vert=False)
-    plt.title("SHAP Box Plot for Top 10 Features")
-    plt.xlabel("SHAP Value")
-    plt.ylabel("Features")
-    plt.grid(True)
-    plt.show()
-
-    # Extract the box plot statistics for each of the top 10 features
-    box_stats = []
-    for feature in top_feature_names:
-        values = shap_values_df[feature]
-        box_stats.append([
-            feature,
-            values.min(),
-            values.quantile(0.25),
-            values.median(),
-            values.quantile(0.75),
-            values.max()
-        ])
-
-    # Convert the statistics to a DataFrame and save to CSV
-    box_stats_df = pd.DataFrame(box_stats, columns=['Feature', 'Min', 'Q1', 'Median', 'Q3', 'Max'])
-    box_stats_df.to_csv("/PATH/shap_box_plot_data.csv", index=False)
-
-
 
 
 if __name__ == '__main__':
     ROC_curves()
-    density_curves()
-    SHAP_box_plot(X_train, shap_values, top_feature_names)
+    SHAP_analysis_GPT()
+
