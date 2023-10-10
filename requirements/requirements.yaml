@@ -1,0 +1,25 @@
+name: llmmed
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - omegaconf
+  - fvcore
+  - iopath
+  - matplotlib 
+  - tqdm
+  - pandas
+  - scikit-learn
+  - scikit-image
+  - jupyter
+  - pip
+  - pip:
+    - lightgbm
+    - scipy
+    - numpy
+    - seaborn
+    - shap
+    - pylibjpeg[libjpeg,openjpeg,rle]
+    - mne
+
