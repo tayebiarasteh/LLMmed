@@ -4,7 +4,7 @@
 Overview
 ------
 
-* This is the official repository of the paper [**Large Language Models Streamline Automated Machine Learning for Clinical Studies**](https://arxiv.org/abs/2308.07688).
+* This is the official repository of the paper [**Large Language Models Streamline Automated Machine Learning for Clinical Studies**](https://arxiv.org/abs/2308.14120).
 * Pre-print version: [https://arxiv.org/abs/2308.14120](https://arxiv.org/abs/2308.14120)
 
 Abstract
