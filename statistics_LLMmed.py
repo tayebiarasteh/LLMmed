@@ -112,27 +112,6 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
     y_pred_proba2 = results2["probability"]
 
 
-    # # ############################## Youden's ##############################
-    # # # threshold finding for metrics calculation (Youden's theorem)
-    # optimal_threshold = np.zeros(y_true1.shape[0])
-    # for idx in range(y_true1.shape[0]):
-    #     fpr, tpr, thresholds = roc_curve(y_true1, y_pred_proba1)
-    #     # optimal_idx = np.argmax(tpr - fpr)
-    #     optimal_idx = np.argmax(tpr + (1 - fpr))
-    #     optimal_threshold[idx] = thresholds[optimal_idx]
-    # y_true1 = (y_pred_proba1 > optimal_threshold).astype(np.int32)
-    #
-    # optimal_threshold = np.zeros(y_true2.shape[0])
-    # for idx in range(y_true2.shape[0]):
-    #     fpr, tpr, thresholds = roc_curve(y_true2, y_pred_proba2)
-    #     # optimal_idx = np.argmax(tpr - fpr)
-    #     optimal_idx = np.argmax(tpr + (1 - fpr))
-    #     optimal_threshold[idx] = thresholds[optimal_idx]
-    # y_true2 = (y_pred_proba2 > optimal_threshold).astype(np.int32)
-    # # ############################## Youden's ##############################
-
-
-
     metrics = [roc_auc_score, accuracy_score, f1_score, sensitivity, specificity]
     metric_names = ["AUC", "Accuracy", "F1 Score", "Sensitivity", "Specificity"]
 
@@ -181,10 +160,3 @@ def main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2, 
 
 
 
-
-
-
-if __name__ == '__main__':
-
-
-    main_analysis_with_saving(csv_file1, csv_file2, output_file1, output_file2)

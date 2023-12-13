@@ -142,13 +142,8 @@ class cohort1():
     def main_train_Validatory(self):
         """Uses Adaboost ensemble tree classifier with grid search optimization
         """
-        # Load the data
         data = pd.read_excel("/PATH/DataZonodo_v2_original.xlsx")
 
-        # Display the first few rows of the data
-        data.head()
-
-        # Set the first row as the column headers
         data.columns = data.iloc[0]
         data = data.drop(0)
 
@@ -199,16 +194,13 @@ class cohort1():
             'n_estimators': [10, 50, 100, 200],
             'learning_rate': [0.001, 0.01, 0.1, 0.5, 1.0]}
 
-        # Use GridSearchCV
         grid_search = GridSearchCV(ada_clf, param_grid, scoring='roc_auc', cv=10, verbose=1, n_jobs=-1)
         grid_search.fit(X_train, y_train)
 
-        # Get the best model
         best_ada_clf = grid_search.best_estimator_
         y_pred = best_ada_clf.predict(X_test)
         y_pred_proba = best_ada_clf.predict_proba(X_test)[:, 1]
 
-        # saving the results in a CSV
         result_df = test_data[["Patient ID"]].copy()
         result_df["probability"] = y_pred_proba
         result_df["ground_truth"] = y_test
@@ -443,7 +435,6 @@ class cohort2():
         X_train['Ethnic'] = le.fit_transform(X_train['Ethnic'])
         X_test['Ethnic'] = [le.transform([val])[0] if val in le.classes_ else 0 for val in X_test['Ethnic']]
 
-        # Remove non-numeric features
         X_train = X_train.drop(['No.', 'CheckID'], axis=1)
         X_test = X_test.drop(['No.', 'CheckID', 'DuodenalOther'], axis=1)
 
@@ -570,7 +561,6 @@ class cohort3():
         X_discovery['c.235delC'] = pd.to_numeric(X_discovery['c.235delC'], errors='coerce')
         X_discovery['c.235delC'].fillna(X_discovery['c.235delC'].median(), inplace=True)
 
-        # Scale the features
         scaler = MinMaxScaler()
         X_discovery = scaler.fit_transform(X_discovery)
         X_validation = scaler.transform(X_validation)

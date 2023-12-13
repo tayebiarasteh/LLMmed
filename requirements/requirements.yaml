@@ -22,4 +22,4 @@ dependencies:
     - shap
     - pylibjpeg[libjpeg,openjpeg,rle]
     - mne
-
+    - openpyxl
