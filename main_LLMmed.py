@@ -333,31 +333,9 @@ class cohort2():
             test_unlabeled[col] = 0
         test_unlabeled = test_unlabeled[X_train.columns]
 
-        # # Scale the features
-        # X_train_scaled = scaler.fit_transform(X_train)
-        # test_unlabeled_scaled = scaler.transform(test_unlabeled)
-
-        # # Train the Gradient Boosting Classifier again
-        # clf.fit(X_train_scaled, y_train)
-        #
-        # # Training accuracy
-        # training_accuracy = clf.score(X_train_scaled, y_train)
-        # print(training_accuracy)
-
         # Drop the 'No.' column from both training and test datasets
         X_train = X_train.drop(columns=['No.'])
         test_unlabeled = test_unlabeled.drop(columns=['No.'])
-
-        # # Scale the features again
-        # X_train_scaled = scaler.fit_transform(X_train)
-        # test_unlabeled_scaled = scaler.transform(test_unlabeled)
-
-        # # Train the Gradient Boosting Classifier again
-        # clf.fit(X_train_scaled, y_train)
-        #
-        # # Training accuracy
-        # training_accuracy = clf.score(X_train_scaled, y_train)
-        # print(training_accuracy)
 
         # Identify non-numeric columns in the training data after previous processing
         remaining_non_numeric_cols = X_train.select_dtypes(exclude=['float64', 'int64']).columns
@@ -380,13 +358,6 @@ class cohort2():
         # Scale the features again
         X_train_scaled = scaler.fit_transform(X_train)
         test_unlabeled_scaled = scaler.transform(test_unlabeled)
-
-        # # Train the Gradient Boosting Classifier again
-        # clf.fit(X_train_scaled, y_train)
-        #
-        # # Training accuracy
-        # training_accuracy = clf.score(X_train_scaled, y_train)
-        # print(training_accuracy)
 
         # Get predicted probabilities from the classifier on the training data
         predicted_probs_train = clf.predict_proba(X_train_scaled)
@@ -734,17 +705,3 @@ class cohort4():
         specificity = tn / (tn + fp)
 
         print(auc, accuracy, f1, sensitivity, specificity)
-
-
-
-
-
-
-if __name__ == '__main__':
-    # cohort = cohort1()
-    # cohort = cohort2()
-    # cohort = cohort3()
-    cohort = cohort4()
-
-    cohort.main_train_Validatory()
-    # cohort.main_train_GPT_ADA()
