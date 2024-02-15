@@ -1,10 +1,10 @@
-# Large Language Models Streamline Automated Machine Learning for Clinical Studies
+# Large language models streamline automated machine learning for clinical studies
 
 
 Overview
 ------
 
-* This is the official repository of the paper [**Large Language Models Streamline Automated Machine Learning for Clinical Studies**](https://arxiv.org/abs/2308.14120).
+* This is the official repository of the paper [**Large language models streamline automated machine learning for clinical studies**](https://doi.org/10.1038/s41467-024-45879-8).
 * Pre-print version: [https://arxiv.org/abs/2308.14120](https://arxiv.org/abs/2308.14120)
 
 Abstract
@@ -41,15 +41,16 @@ Our source code for training and evaluation of the deep neural networks, image a
 ------
 ### In case you use this repository, please cite the original paper:
 
-S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large Language Models Streamline Automated Machine Learning for Clinical Studies*. arxiv.2308.14120, https://doi.org/10.48550/arXiv.2308.14120, 2023.
+S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large language models streamline automated machine learning for clinical studies*. Nature Communications, 15(1), (2024), https://doi.org/10.1038/s41467-024-45879-8.
 
 ### BibTex
 
     @article {gptada_arasteh,
       author = {Tayebi Arasteh, Soroosh and Misera, Leo and Kather, Jakob Nikolas and Truhn, Daniel and Nebelung, Sven},
-      title = {Large Language Models Streamline Automated Machine Learning for Clinical Studies},
-      year = {2023},
-      doi = {10.48550/arXiv.2308.14120},
-      publisher = {arXiv},
-      journal = {arXiv}
+      title = {Large language models streamline automated machine learning for clinical studies},
+      year = {2024},
+      volume = {15},
+      doi = {10.1038/s41467-024-45879-8},
+      publisher = {Nature Portfolio},
+      journal = {Nature Communications}
     }
