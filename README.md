@@ -41,7 +41,7 @@ Our source code for training and evaluation of the deep neural networks, image a
 ------
 ### In case you use this repository, please cite the original paper:
 
-S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large language models streamline automated machine learning for clinical studies*. Nature Communications, 15(1), (2024), https://doi.org/10.1038/s41467-024-45879-8.
+S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large language models streamline automated machine learning for clinical studies*. Nature Communications, 15(1), 1603 (2024), https://doi.org/10.1038/s41467-024-45879-8.
 
 ### BibTex
 
@@ -50,6 +50,7 @@ S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large language models streamline
       title = {Large language models streamline automated machine learning for clinical studies},
       year = {2024},
       volume = {15},
+      number = {1603},
       doi = {10.1038/s41467-024-45879-8},
       publisher = {Nature Portfolio},
       journal = {Nature Communications}
