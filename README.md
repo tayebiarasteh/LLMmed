@@ -46,7 +46,7 @@ S. Tayebi Arasteh, T. Han, M. Lotfinia, et al. *Large language models streamline
 ### BibTex
 
     @article {gptada_arasteh,
-      author = {Tayebi Arasteh, Soroosh and Misera, Leo and Kather, Jakob Nikolas and Truhn, Daniel and Nebelung, Sven},
+      author = {Tayebi Arasteh, Soroosh and Han, Tianyu and Lotfinia, Mahshad and Kuhl, Christiane and Kather, Jakob Nikolas and Truhn, Daniel and Nebelung, Sven},
       title = {Large language models streamline automated machine learning for clinical studies},
       year = {2024},
       volume = {15},
